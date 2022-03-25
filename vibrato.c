@@ -4,6 +4,9 @@
 #include <stdlib.h>
 #include "vibrato.h"
 
+int sampling_rate;
+float W; // Delay in seconds
+int f_LFO; // Frequency of LFO
 
 float NOMINAL_DELAY;
 float CHORUS_WIDTH;
@@ -17,13 +20,15 @@ float i;
 float frac;
 int sampleNumber;
 
+void init_vibrato(int _sampling_rate, float _W, int _f_LFO){
+    sampling_rate = _sampling_rate;
+    W = _W;
+    f_LFO = _f_LFO;
 
+    NOMINAL_DELAY = round((float)W * (float)sampling_rate); // Center of the delay
+    CHORUS_WIDTH = round((float)W * (float)sampling_rate); // Half of the delay
 
-void init_vibrato(){
-    NOMINAL_DELAY = round((float)W * (float)Fs); // Center of the delay
-    CHORUS_WIDTH = round((float)W * (float)Fs); // Half of the delay
-
-    f_LFO_samples = (float)f_LFO / (float)Fs;
+    f_LFO_samples = (float)f_LFO / (float)sampling_rate;
     delayline_size = (int) (NOMINAL_DELAY + CHORUS_WIDTH * 2);
 
     delayline = malloc(delayline_size * sizeof(float));
@@ -39,7 +44,6 @@ static void insert_in_delayline(float value){
         *(delayline + i) = *(delayline + i - 1);
     }
     *(delayline + 0) = value;
-    //print_delayline();
 }
 
 static void print_delayline(){

@@ -5,6 +5,8 @@
 
 #include "vibrato.h"
 
+#define NUM_SECONDS 500
+#define Fs 44100 // Sampling rate
 
 static int callback(const void *inputBuffer, void *outputBuffer, unsigned long framesPerBuffer,
                              const PaStreamCallbackTimeInfo* timeInfo,
@@ -33,7 +35,7 @@ static int callback(const void *inputBuffer, void *outputBuffer, unsigned long f
 int main(void) {
 
     // Set up vibrato effect
-    init_vibrato();
+    init_vibrato(Fs, 0.005, 5);
 
     // Reference to the stream
     PaStream *stream;
