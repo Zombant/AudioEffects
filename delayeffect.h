@@ -17,14 +17,16 @@ typedef struct {
     float i;
     float frac;
     int sampleNumber;
-} Vibrato;
+} DelayEffect;
 
-void init_vibrato(Vibrato *instance, int _sampling_rate, float _W, int _f_LFO);
+void init_delay_effect(DelayEffect *instance, int _sampling_rate, float _W, int _f_LFO);
 
-static void insert_in_delayline(Vibrato *instance, float value);
+static void insert_in_delayline(DelayEffect *instance, float value);
 
-static void print_delayline(Vibrato *instance);
+static void print_delayline(DelayEffect *instance);
 
-float process_vibrato(Vibrato *instance, float value);
+float process_vibrato(DelayEffect *instance, float value);
+
+float process_flanger(DelayEffect *instance, float value);
 
 #endif

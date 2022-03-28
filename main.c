@@ -3,13 +3,13 @@
 #include <math.h>
 #include <stdlib.h>
 
-#include "vibrato.h"
+#include "delayeffect.h"
 
 #define NUM_SECONDS 500
 #define Fs 44100 // Sampling rate
 
-Vibrato *vib1;
-Vibrato *vib2;
+DelayEffect *vib;
+DelayEffect *flange;
 
 static int callback(const void *inputBuffer, void *outputBuffer, unsigned long framesPerBuffer,
                              const PaStreamCallbackTimeInfo* timeInfo,
@@ -25,7 +25,10 @@ static int callback(const void *inputBuffer, void *outputBuffer, unsigned long f
         inValue = *in++;
 
         // Apply vibrato effect (1-stage)
-        outValue = process_vibrato(vib1, inValue);
+        //outValue = process_vibrato(vib, inValue);
+
+        // Apply flanger
+        outValue = process_flanger(flange, inValue);
 
 
         // Apply vibrato effect (2-stage)
@@ -42,12 +45,12 @@ static int callback(const void *inputBuffer, void *outputBuffer, unsigned long f
 
 int main(void) {
 
-    vib1 = malloc(sizeof(Vibrato));
-    vib2 = malloc(sizeof(Vibrato));
+    vib = malloc(sizeof(DelayEffect));
+    flange = malloc(sizeof(DelayEffect));
 
-    // Set up vibrato effect
-    init_vibrato(vib1, Fs, 0.005, 5);
-    init_vibrato(vib2, Fs, 0.005, 12);
+    // Set up effects
+    init_delay_effect(vib, Fs, 0.005, 10);
+    init_delay_effect(flange, Fs, 0.01, 1);
 
     // Reference to the stream
     PaStream *stream;
@@ -94,6 +97,18 @@ int main(void) {
 
 error:
     Pa_Terminate();
+
+    free(vib->delayline);
+    vib->delayline = NULL;
+    free(vib);
+    vib = NULL;
+
+    
+    free(flange->delayline);
+    flange->delayline = NULL;
+    free(flange);
+    flange = NULL;
+
     printf("\nProgram has ended\n");
     printf("Error %d: %s\n", err, Pa_GetErrorText(err));
     return err;
