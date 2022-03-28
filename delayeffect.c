@@ -2,7 +2,7 @@
 #include <stdio.h>
 #include <math.h>
 #include <stdlib.h>
-#include "vibrato.h"
+#include "delayeffect.h"
 
 
 void init_delay_effect(DelayEffect *instance, int _sampling_rate, float _W, int _f_LFO){

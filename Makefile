@@ -1,3 +1,3 @@
 
-vibrato:
-	gcc main.c vibrato.c -o vibrato.out -lm -lportaudio
+build:
+	gcc main.c delayeffect.c -o effect.out -lm -lportaudio

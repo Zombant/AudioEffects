@@ -1,5 +1,5 @@
-#ifndef VIBRATO_H
-#define VIBRATO_H
+#ifndef DELAYEFFECT_H
+#define DELAYEFFECT_H
 
 typedef struct {
     int sampling_rate;
