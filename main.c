@@ -8,6 +8,9 @@
 #define NUM_SECONDS 500
 #define Fs 44100 // Sampling rate
 
+Vibrato *vib1;
+Vibrato *vib2;
+
 static int callback(const void *inputBuffer, void *outputBuffer, unsigned long framesPerBuffer,
                              const PaStreamCallbackTimeInfo* timeInfo,
                              PaStreamCallbackFlags statusFlags, void *userData){
@@ -21,8 +24,13 @@ static int callback(const void *inputBuffer, void *outputBuffer, unsigned long f
         // Get input sample
         inValue = *in++;
 
-        // Apply vibrato effect
-        outValue = process_vibrato(inValue);
+        // Apply vibrato effect (1-stage)
+        outValue = process_vibrato(vib1, inValue);
+
+
+        // Apply vibrato effect (2-stage)
+        //outValue1 = process_vibrato(vib1, inValue);
+        //outValue2 = process_vibrato(vib2, outValue1);
 
         // Output the resulting samples to both channels
         *out++ = outValue;
@@ -34,8 +42,12 @@ static int callback(const void *inputBuffer, void *outputBuffer, unsigned long f
 
 int main(void) {
 
+    vib1 = malloc(sizeof(Vibrato));
+    vib2 = malloc(sizeof(Vibrato));
+
     // Set up vibrato effect
-    init_vibrato(Fs, 0.005, 5);
+    init_vibrato(vib1, Fs, 0.005, 5);
+    init_vibrato(vib2, Fs, 0.005, 12);
 
     // Reference to the stream
     PaStream *stream;

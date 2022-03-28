@@ -1,12 +1,30 @@
 #ifndef VIBRATO_H
 #define VIBRATO_H
 
-void init_vibrato(int _sampling_rate, float _W, int _f_LFO);
+typedef struct {
+    int sampling_rate;
+    float W; // Delay in seconds
+    int f_LFO; // Frequency of LFO
 
-static void insert_in_delayline(float value);
+    float NOMINAL_DELAY;
+    float CHORUS_WIDTH;
 
-static void print_delayline();
+    float f_LFO_samples;
+    int delayline_size;
 
-float process_vibrato(float value);
+    float *delayline;
+    float i_frac;
+    float i;
+    float frac;
+    int sampleNumber;
+} Vibrato;
+
+void init_vibrato(Vibrato *instance, int _sampling_rate, float _W, int _f_LFO);
+
+static void insert_in_delayline(Vibrato *instance, float value);
+
+static void print_delayline(Vibrato *instance);
+
+float process_vibrato(Vibrato *instance, float value);
 
 #endif

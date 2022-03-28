@@ -4,64 +4,49 @@
 #include <stdlib.h>
 #include "vibrato.h"
 
-int sampling_rate;
-float W; // Delay in seconds
-int f_LFO; // Frequency of LFO
 
-float NOMINAL_DELAY;
-float CHORUS_WIDTH;
+void init_vibrato(Vibrato *instance, int _sampling_rate, float _W, int _f_LFO){
+    instance->sampling_rate = _sampling_rate;
+    instance->W = _W;
+    instance->f_LFO = _f_LFO;
 
-float f_LFO_samples;
-int delayline_size;
+    instance->NOMINAL_DELAY = round((float)instance->W * (float)instance->sampling_rate); // Center of the delay
+    instance->CHORUS_WIDTH = round((float)instance->W * (float)instance->sampling_rate); // Half of the delay
 
-float *delayline;
-float i_frac;
-float i;
-float frac;
-int sampleNumber;
+    instance->f_LFO_samples = (float)instance->f_LFO / (float)instance->sampling_rate;
+    instance->delayline_size = (int) (instance->NOMINAL_DELAY + instance->CHORUS_WIDTH * 2);
 
-void init_vibrato(int _sampling_rate, float _W, int _f_LFO){
-    sampling_rate = _sampling_rate;
-    W = _W;
-    f_LFO = _f_LFO;
-
-    NOMINAL_DELAY = round((float)W * (float)sampling_rate); // Center of the delay
-    CHORUS_WIDTH = round((float)W * (float)sampling_rate); // Half of the delay
-
-    f_LFO_samples = (float)f_LFO / (float)sampling_rate;
-    delayline_size = (int) (NOMINAL_DELAY + CHORUS_WIDTH * 2);
-
-    delayline = malloc(delayline_size * sizeof(float));
-    for(int sample = 0; sample < delayline_size; sample++){
-        delayline[sample] = 0;
+    instance->delayline = malloc(instance->delayline_size * sizeof(float));
+    for(int sample = 0; sample < instance->delayline_size; sample++){
+        instance->delayline[sample] = 0;
     }
 
-    sampleNumber = 0;
+    instance->sampleNumber = 0;
 }
 
-static void insert_in_delayline(float value){
-    for(int i = delayline_size-1; i > 0; i--){
-        *(delayline + i) = *(delayline + i - 1);
+static void insert_in_delayline(Vibrato *instance, float value){
+    for(int i = instance->delayline_size-1; i > 0; i--){
+        *(instance->delayline + i) = *(instance->delayline + i - 1);
     }
-    *(delayline + 0) = value;
+    *(instance->delayline + 0) = value;
 }
 
-static void print_delayline(){
-    for(int i = 0; i < delayline_size; i++){
-        printf("%f\t", delayline[i]);
+static void print_delayline(Vibrato *instance){
+    for(int i = 0; i < instance->delayline_size; i++){
+        printf("%f\t", instance->delayline[i]);
     }
     printf("\n\n\n\n");
 }
 
-float process_vibrato(float value){
-    i_frac = NOMINAL_DELAY + CHORUS_WIDTH * sinf(f_LFO_samples * 2 * M_PI * sampleNumber);
-    i = floor(i_frac);
-    frac = i_frac - i;
+float process_vibrato(Vibrato *instance, float value){
+    instance->i_frac = instance->NOMINAL_DELAY + instance->CHORUS_WIDTH * sinf(instance->f_LFO_samples * 2 * M_PI * instance->sampleNumber);
+    instance->i = floor(instance->i_frac);
+    instance->frac = instance->i_frac - instance->i;
 
-    insert_in_delayline(value);
+    insert_in_delayline(instance, value);
 
-    sampleNumber++;
+    instance->sampleNumber++;
 
-    return frac * delayline[(int)i + 1] + (1-frac) * delayline[(int)i];
+    return instance->frac * instance->delayline[(int)instance->i + 1] + (1-instance->frac) * instance->delayline[(int)instance->i];
     
 }
