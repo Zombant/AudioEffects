@@ -5,7 +5,7 @@
 #include "delayeffect.h"
 
 
-void init_delay_effect(DelayEffect *instance, int _sampling_rate, float _W, int _f_LFO){
+void init_delay_effect(DelayEffect *instance, int _sampling_rate, float _W, float _f_LFO){
     instance->sampling_rate = _sampling_rate;
     instance->W = _W;
     instance->f_LFO = _f_LFO;
@@ -61,9 +61,27 @@ float process_flanger(DelayEffect *instance, float value){
 
     instance->sampleNumber++;
 
-    value = value - (instance->delayline[(int)instance->NOMINAL_DELAY] * -0.7071);
+    value = value - (instance->delayline[(int)instance->NOMINAL_DELAY] * 0.7071);
 
     float forward = (instance->frac * instance->delayline[(int)instance->i + 1] + (1-instance->frac) * instance->delayline[(int)instance->i]) * 0.7071;
+    float blend = value * 0.7071;
+
+    return forward + blend;
+}
+
+float process_white_chorus(DelayEffect *instance, float value){
+    //TODO: Make random lowpass noise instead of sin
+    instance->i_frac = instance->NOMINAL_DELAY + instance->CHORUS_WIDTH * sinf(instance->f_LFO_samples * 2 * M_PI * instance->sampleNumber);
+    instance->i = floor(instance->i_frac);
+    instance->frac = instance->i_frac - instance->i;
+
+    insert_in_delayline(instance, value);
+
+    instance->sampleNumber++;
+
+    value = value + (instance->delayline[(int)instance->NOMINAL_DELAY] * -0.7071);
+
+    float forward = (instance->frac * instance->delayline[(int)instance->i + 1] + (1-instance->frac) * instance->delayline[(int)instance->i]);
     float blend = value * 0.7071;
 
     return forward + blend;

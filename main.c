@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <math.h>
 #include <stdlib.h>
+#include <time.h>
 
 #include "delayeffect.h"
 
@@ -10,6 +11,7 @@
 
 DelayEffect *vib;
 DelayEffect *flange;
+DelayEffect *white_chorus;
 
 static int callback(const void *inputBuffer, void *outputBuffer, unsigned long framesPerBuffer,
                              const PaStreamCallbackTimeInfo* timeInfo,
@@ -30,6 +32,9 @@ static int callback(const void *inputBuffer, void *outputBuffer, unsigned long f
         // Apply flanger
         outValue = process_flanger(flange, inValue);
 
+        // Apply white chorus
+        //outValue = process_white_chorus(white_chorus, inValue);
+
 
         // Apply vibrato effect (2-stage)
         //outValue1 = process_vibrato(vib1, inValue);
@@ -45,12 +50,16 @@ static int callback(const void *inputBuffer, void *outputBuffer, unsigned long f
 
 int main(void) {
 
+    srand(time(0));
+
     vib = malloc(sizeof(DelayEffect));
     flange = malloc(sizeof(DelayEffect));
+    white_chorus = malloc(sizeof(DelayEffect));
 
     // Set up effects
     init_delay_effect(vib, Fs, 0.005, 10);
-    init_delay_effect(flange, Fs, 0.01, 1);
+    init_delay_effect(flange, Fs, 0.001, 0.1);
+    init_delay_effect(white_chorus, Fs, 0.03, 1);
 
     // Reference to the stream
     PaStream *stream;
