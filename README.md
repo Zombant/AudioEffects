@@ -8,7 +8,7 @@ Dependencies:
 ```bash
 git clone https://github.com/Zombant/AudioEffects.git
 cd AudioEffects
-make vibrato
+make build
 ```
 # To use in your project
 1. Clone the repository
