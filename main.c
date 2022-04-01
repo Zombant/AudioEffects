@@ -4,14 +4,16 @@
 #include <stdlib.h>
 #include <time.h>
 
-#include "delayeffect.h"
+#include "vibrato.h"
+#include "flanger.h"
+#include "chorus.h"
 
 #define NUM_SECONDS 500
 #define Fs 44100 // Sampling rate
 
-DelayEffect *vib;
-DelayEffect *flange;
-DelayEffect *white_chorus;
+Vibrato *vibrato;
+Flanger *flanger;
+Chorus *white_chorus;
 
 static int callback(const void *inputBuffer, void *outputBuffer, unsigned long framesPerBuffer,
                              const PaStreamCallbackTimeInfo* timeInfo,
@@ -27,10 +29,10 @@ static int callback(const void *inputBuffer, void *outputBuffer, unsigned long f
         inValue = *in++;
 
         // Apply vibrato effect (1-stage)
-        //outValue = process_vibrato(vib, inValue);
+        outValue = process_vibrato(vibrato, inValue);
 
         // Apply flanger
-        outValue = process_flanger(flange, inValue);
+        //outValue = process_flanger(flanger, inValue);
 
         // Apply white chorus
         //outValue = process_white_chorus(white_chorus, inValue);
@@ -52,14 +54,14 @@ int main(void) {
 
     srand(time(0));
 
-    vib = malloc(sizeof(DelayEffect));
-    flange = malloc(sizeof(DelayEffect));
-    white_chorus = malloc(sizeof(DelayEffect));
+    vibrato = malloc(sizeof(Vibrato));
+    flanger = malloc(sizeof(Flanger));
+    white_chorus = malloc(sizeof(Chorus));
 
     // Set up effects
-    init_delay_effect(vib, Fs, 0.005, 10);
-    init_delay_effect(flange, Fs, 0.001, 0.1);
-    init_delay_effect(white_chorus, Fs, 0.03, 1);
+    init_vibrato(vibrato, Fs, 0.005, 10);
+    init_flanger(flanger, Fs, 0.001, 0.1);
+    init_white_chorus(white_chorus, Fs, 0.03, 1);
 
     // Reference to the stream
     PaStream *stream;
@@ -106,17 +108,6 @@ int main(void) {
 
 error:
     Pa_Terminate();
-
-    free(vib->delayline);
-    vib->delayline = NULL;
-    free(vib);
-    vib = NULL;
-
-    
-    free(flange->delayline);
-    flange->delayline = NULL;
-    free(flange);
-    flange = NULL;
 
     printf("\nProgram has ended\n");
     printf("Error %d: %s\n", err, Pa_GetErrorText(err));

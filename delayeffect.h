@@ -19,6 +19,7 @@ typedef struct {
     int sampleNumber;
 } DelayEffect;
 
+
 void init_delay_effect(DelayEffect *instance, int _sampling_rate, float _W, float _f_LFO);
 
 static void insert_in_delayline(DelayEffect *instance, float value);

@@ -1,3 +1,7 @@
 
 build:
-	gcc main.c delayeffect.c -o effect.out -lm -lportaudio
+	gcc main.c vibrato.c flanger.c chorus.c -o effect.out -lm -lportaudio
+
+run:
+	make build
+	./effect.out
