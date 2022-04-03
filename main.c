@@ -7,6 +7,7 @@
 #include "vibrato.h"
 #include "flanger.h"
 #include "chorus.h"
+#include "allpass.h"
 
 #define NUM_SECONDS 500
 #define Fs 44100 // Sampling rate
@@ -14,6 +15,9 @@
 Vibrato *vibrato;
 Flanger *flanger;
 Chorus *white_chorus;
+
+FirstOrderAllpass *allpass_filter1;
+SecondOrderAllpass *allpass_filter2;
 
 static int callback(const void *inputBuffer, void *outputBuffer, unsigned long framesPerBuffer,
                              const PaStreamCallbackTimeInfo* timeInfo,
@@ -29,13 +33,26 @@ static int callback(const void *inputBuffer, void *outputBuffer, unsigned long f
         inValue = *in++;
 
         // Apply vibrato effect (1-stage)
-        outValue = process_vibrato(vibrato, inValue);
+        //outValue = process_vibrato(vibrato, inValue);
 
         // Apply flanger
         //outValue = process_flanger(flanger, inValue);
 
         // Apply white chorus
         //outValue = process_white_chorus(white_chorus, inValue);
+
+        // Apply allpass filter
+        //outValue = allpass1(allpass_filter1, inValue);
+        //outValue = allpass2(allpass_filter2, inValue);
+
+        // Apply filter
+        outValue = lowpass1(allpass_filter1, inValue);
+        //outValue = highpass1(allpass_filter1, inValue);
+
+        // Pass audio
+        //outValue = inValue;
+
+        //printf("Input: %f\nOutput: %f\n\n", inValue, outValue);
 
 
         // Apply vibrato effect (2-stage)
@@ -58,10 +75,15 @@ int main(void) {
     flanger = malloc(sizeof(Flanger));
     white_chorus = malloc(sizeof(Chorus));
 
+    allpass_filter1 = malloc(sizeof(FirstOrderAllpass));
+    allpass_filter2 = malloc(sizeof(SecondOrderAllpass));
+
     // Set up effects
     init_vibrato(vibrato, Fs, 0.005, 10);
     init_flanger(flanger, Fs, 0.001, 0.1);
-    init_white_chorus(white_chorus, Fs, 0.03, 1);
+    init_white_chorus(white_chorus, Fs, 0.01, 0.1);
+    init_allpass1(allpass_filter1, -.99);
+    init_allpass2(allpass_filter2, Fs, 5000, 2000);
 
     // Reference to the stream
     PaStream *stream;
