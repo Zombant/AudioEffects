@@ -8,6 +8,7 @@
 #include "flanger.h"
 #include "chorus.h"
 #include "allpass.h"
+#include "wahwah.h"
 
 #define NUM_SECONDS 500
 #define Fs 44100 // Sampling rate
@@ -15,6 +16,7 @@
 Vibrato *vibrato;
 Flanger *flanger;
 Chorus *white_chorus;
+WahWah *wahwah;
 
 FirstOrderAllpass *allpass_filter1;
 SecondOrderAllpass *allpass_filter2;
@@ -40,6 +42,9 @@ static int callback(const void *inputBuffer, void *outputBuffer, unsigned long f
 
         // Apply white chorus
         //outValue = process_white_chorus(white_chorus, inValue);
+        
+        // Apply wahwah
+        outValue = process_wahwah(wahwah, inValue);
 
         // Apply allpass filter
         //outValue = allpass1(allpass_filter1, inValue);
@@ -49,7 +54,7 @@ static int callback(const void *inputBuffer, void *outputBuffer, unsigned long f
         //outValue = lowpass1(allpass_filter1, inValue);
         //outValue = highpass1(allpass_filter1, inValue);
         //outValue = bandstop2(allpass_filter2, inValue);
-        outValue = bandpass2(allpass_filter2, inValue);
+        //outValue = bandpass2(allpass_filter2, inValue);
 
         // Pass audio
         //outValue = inValue;
@@ -76,6 +81,7 @@ int main(void) {
     vibrato = malloc(sizeof(Vibrato));
     flanger = malloc(sizeof(Flanger));
     white_chorus = malloc(sizeof(Chorus));
+    wahwah = malloc(sizeof(WahWah));
 
     allpass_filter1 = malloc(sizeof(FirstOrderAllpass));
     allpass_filter2 = malloc(sizeof(SecondOrderAllpass));
@@ -85,7 +91,8 @@ int main(void) {
     init_flanger(flanger, Fs, 0.001, 0.1);
     init_white_chorus(white_chorus, Fs, 0.01, 0.1);
     init_allpass1(allpass_filter1, -.99);
-    init_allpass2(allpass_filter2, Fs, 5000, 500);
+    init_allpass2(allpass_filter2, Fs, 1000, 500);
+    init_wahwah(wahwah, Fs, 0.7, 350, 2200, 3.0); // Dunlop Crybaby
 
     // Reference to the stream
     PaStream *stream;

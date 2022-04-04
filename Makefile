@@ -1,5 +1,5 @@
 build:
-	gcc main.c vibrato.c flanger.c chorus.c allpass.c -o effect.out -lm -lportaudio
+	gcc main.c vibrato.c flanger.c chorus.c allpass.c wahwah.c -o effect.out -lm -lportaudio
 
 run:
 	make build
