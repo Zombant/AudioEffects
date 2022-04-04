@@ -57,3 +57,13 @@ float allpass2(SecondOrderAllpass *instance, float value){
     
     return result;
 }
+
+float bandpass2(SecondOrderAllpass *instance, float value){
+    float filter_result = allpass2(instance, value);
+    return 0.5 * (value - filter_result);
+}
+
+float bandstop2(SecondOrderAllpass *instance, float value){
+    float filter_result = allpass2(instance, value);
+    return 0.5 * (value + filter_result);
+}

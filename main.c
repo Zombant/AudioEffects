@@ -46,8 +46,10 @@ static int callback(const void *inputBuffer, void *outputBuffer, unsigned long f
         //outValue = allpass2(allpass_filter2, inValue);
 
         // Apply filter
-        outValue = lowpass1(allpass_filter1, inValue);
+        //outValue = lowpass1(allpass_filter1, inValue);
         //outValue = highpass1(allpass_filter1, inValue);
+        //outValue = bandstop2(allpass_filter2, inValue);
+        outValue = bandpass2(allpass_filter2, inValue);
 
         // Pass audio
         //outValue = inValue;
@@ -83,7 +85,7 @@ int main(void) {
     init_flanger(flanger, Fs, 0.001, 0.1);
     init_white_chorus(white_chorus, Fs, 0.01, 0.1);
     init_allpass1(allpass_filter1, -.99);
-    init_allpass2(allpass_filter2, Fs, 5000, 2000);
+    init_allpass2(allpass_filter2, Fs, 5000, 500);
 
     // Reference to the stream
     PaStream *stream;

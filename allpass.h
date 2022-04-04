@@ -31,4 +31,8 @@ void init_allpass2(SecondOrderAllpass *instance, float sampling_rate, float fc, 
 
 float allpass2(SecondOrderAllpass *instance, float value);
 
+float bandpass2(SecondOrderAllpass *instance, float value);
+
+float bandstop2(SecondOrderAllpass *instance, float value);
+
 #endif
