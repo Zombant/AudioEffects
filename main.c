@@ -4,11 +4,14 @@
 #include <stdlib.h>
 #include <time.h>
 
+#include "util.h"
+
 #include "vibrato.h"
 #include "flanger.h"
 #include "chorus.h"
 #include "allpass.h"
 #include "wahwah.h"
+#include "nonlinearity.h"
 
 #define NUM_SECONDS 500
 #define Fs 44100 // Sampling rate
@@ -44,7 +47,12 @@ static int callback(const void *inputBuffer, void *outputBuffer, unsigned long f
         //outValue = process_white_chorus(white_chorus, inValue);
         
         // Apply wahwah
-        outValue = process_wahwah(wahwah, inValue);
+        //outValue = process_wahwah(wahwah, inValue);
+
+        // Apply static nonlinearities
+        //outValue = square(inValue);
+        outValue = overdrive(inValue, 10);
+        
 
         // Apply allpass filter
         //outValue = allpass1(allpass_filter1, inValue);
